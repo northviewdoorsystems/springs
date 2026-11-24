@@ -17,16 +17,17 @@ No build step, no sign-in, no external data. Fonts load from Google Fonts and fa
 
 ## How it picks
 
-Pair lift = (IPPT × 2) ÷ drum multiplier. The pick is the pair whose lift is closest to door weight.
+Pair lift = (IPPT × 2 × turns) ÷ HMA. The pick is the pair whose lift is closest to door weight.
 
 - **IPPT, dimensions, cycle ratings:** Northview Torsion Spring Reference (Updated 11/2026). Mixed pairs use the average IPPT of the two springs, as on the chart.
-- **Multipliers and turns:** Canimex/Action D400-96 standard-lift drum table (HMA 2.275″), 6′0″–8′2″, columns 12″ radius, 15″ radius, low headroom.
+- **Turns (Northview field values):** door height in feet + ¾ (15″ radius), + ½ (12″), + ¼ (low headroom), rounded to the nearest quarter turn. 7′ = 7¾ / 7½ / 7¼; 8′ = 8¾ / 8½ / 8¼. Published values (SSC 7.9 / 8.9) can't be wound in practice. Lift is computed at the turns actually wound.
+- **HMA (cable lift radius):** from the Canimex/Action D400-96 standard-lift drum table (multiplier × turns for the height and track, ≈2.27″). Effective multiplier = HMA ÷ field turns.
 - **Low headroom** assumes front-mount double track on standard 4″ drums. Not valid for rear-mount or low-headroom drums.
-- **Cycles** are the chart's 15″ ratings interpolated by turns (7′ = 7.9 turns, 8′ = 8.8 turns).
+- **Cycles** are the chart's ratings (which assume SSC turns 7.9 / 8.9) interpolated by turns.
 
 ## Known data issues
 
-- The printed chart's 8′ column uses a 0.2500 multiplier; the D400-96 15″ value is 0.2579. This tool uses 0.2579, so 8′ lifts read about 3% below the printed chart.
+- The printed chart's 8′ column uses a 0.2500 multiplier. At 8¾ field turns this tool's 15″ multiplier is 0.2594, so 8′ lifts read about 3–4% below the printed chart.
 - Gold (High Cycle) is identical to standard Gold on the chart. Confirm before relying on it.
 
 ## Updating

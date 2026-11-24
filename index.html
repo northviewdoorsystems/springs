@@ -52,7 +52,7 @@ button{font:600 15px Montserrat,sans-serif;min-height:44px;border-radius:10px;bo
 .coil{height:120px;display:flex;gap:10px;align-items:center}
 .coil svg{height:100%;flex:1}
 .name{font-size:30px;font-weight:700;line-height:1.05;margin:0}
-.dims{color:var(--mute);font-size:15px}
+.dims{color:var(--mute);font-size:15px}.ippt{color:var(--ink)}
 .big{font-size:clamp(44px,12vw,64px);font-weight:700;line-height:1;white-space:nowrap}
 .big small{font-size:20px;color:var(--mute);font-weight:600}
 .badge{display:inline-block;font-weight:600;font-size:15px;padding:4px 10px;border-radius:999px;border:1.5px solid currentColor;white-space:nowrap}
@@ -67,6 +67,7 @@ th{text-align:left;font-size:13px;color:var(--mute);font-weight:600;padding:6px 
 td{padding:9px 6px;border-bottom:1px solid var(--line)}
 td.n,th.n{text-align:right;white-space:nowrap}
 tr.hit td{background:light-dark(#f6e6e6,#2a1a1f);font-weight:600}
+.nm{display:inline-flex;align-items:baseline}.nm .sw{flex:none}
 .sw{display:inline-flex;gap:3px;vertical-align:-2px;margin-right:6px}.sw i{width:12px;height:12px;border-radius:3px;border:1px solid light-dark(#0003,#fff5)}
 h2{font-size:22px;margin:0 0 8px;line-height:1.1}
 .note{font-size:14px;color:var(--mute)}.note p{margin:0 0 8px}
@@ -89,15 +90,14 @@ h2{font-size:22px;margin:0 0 8px;line-height:1.1}
   <section class="card wide"><h2 id="lt">Nearby options</h2><div class="scroll"><table id="tbl"></table></div></section>
   <section class="card wide note">
     <h2>How it picks</h2>
-    <p>Pair lift = (IPPT × 2) ÷ drum multiplier. IPPT values are from the Northview Torsion Spring Reference (11/2026). Multipliers and turns are Canimex/Action D400-96 standard-lift values (HMA 2.275″) for the selected height and track. The pick is the pair whose lift is closest to door weight.</p>
-    <p>Track matters because it changes turns on the spring, not door weight: a 15″ radius stores more turns (more high lift), 12″ fewer, low headroom fewer still. Fewer turns → less torque at the closed position → less lift from the same spring.</p>
-    <p>Low HR assumes front-mount double track on standard 4″ drums. Rear-mount or low-headroom drums use different multipliers. Cycle ratings are the chart's 15″ figures, interpolated by turns; 12″ and Low HR run fewer turns, so actual life is slightly higher.</p>
-    <p>The printed chart's 8′ column uses a 0.2500 multiplier; the D400-96 15″ value is 0.2579, so this tool shows 8′ lifts about 3% lower than the chart.</p>
+    <p>Pair lift = (IPPT × 2 × turns) ÷ HMA, where turns are the turns actually wound and HMA (≈2.27″) is the cable lift radius of the 4″ standard-lift drum (Canimex/Action D400-96). The pick is the pair whose lift is closest to door weight. IPPT values are from the Northview Torsion Spring Reference (11/2026).</p>
+    <p>Turns use Northview field values, not the published 7.9 / 8.9 nobody can wind: door height in feet + ¾ for 15″ radius, + ½ for 12″, + ¼ for Low HR, to the nearest quarter turn. A 7′ door is 7¾ / 7½ / 7¼ turns; an 8′ door 8¾ / 8½ / 8¼. Fewer turns store less torque at the closed position, so lift is computed at the turns you actually wind.</p>
+    <p>Low HR assumes front-mount double track on standard 4″ drums. Rear-mount or low-headroom drums use different numbers. Cycle ratings are the chart's figures, which assume SSC's 7.9 / 8.9 turns, interpolated by turns; fewer turns mean slightly longer life.</p>
+    <p>The printed chart's 8′ lifts use a 0.2500 multiplier and read about 3–4% higher than this tool.</p>
   </section>
 </main>
 <script>
 {
-const HMA=2.275;
 // height label, inches, [mult, turns] for 12", 15", Low HR — Canimex D400-96
 const H=[["6′0″",72,[.3374,6.7],[.3219,7.1],[.3631,6.3]],["6′3″",75,[.3266,7.0],[.3124,7.3],[.3504,6.5]],
 ["6′6″",78,[.3165,7.2],[.3033,7.5],[.3385,6.7]],["6′9″",81,[.3070,7.4],[.2948,7.7],[.3274,6.9]],
@@ -105,6 +105,9 @@ const H=[["6′0″",72,[.3374,6.7],[.3219,7.1],[.3631,6.3]],["6′3″",75,[.32
 ["7′6″",90,[.2814,8.1],[.2715,8.4],[.2979,7.6]],["7′9″",93,[.2738,8.3],[.2645,8.6],[.2893,7.9]],
 ["8′0″",96,[.2666,8.5],[.2579,8.8],[.2811,8.1]],["8′2″",98,[.2619,8.7],[.2536,9.0],[.2758,8.2]]];
 const TI={"12":2,"15":3,"LH":4};
+// Northview field turns: height in feet + offset, to the nearest quarter turn (7′: 7½ / 7¾ / 7¼; 8′: 8½ / 8¾ / 8¼)
+const OFF={"12":.5,"15":.75,"LH":.25};
+const tf=t=>{const w=Math.floor(t+1e-9),q=Math.round((t-w)*4);return (q===4?w+1:w)+(["","¼","½","¾",""][q])};
 const C={White:"#eceff3",Purple:"#7b2fd0",Pink:"#ef7fb0",Gold:"#f2a516",Blue:"#1f4fd8",Aluminum:"#b4bcc6",Brown:"#7a4a2a",Red:"#d7261e",Black:"#1c1c1c","Lt. Blue":"#3cb7ec"};
 // name, colors, dims, IPPT (per spring, avg for mixed), cycles@7', cycles@8', high-cycle?
 const S=[["White",["White"],"2 × .207 × 21-1/2",24.8,14000,null,0],["Purple",["Purple"],"2 × .225 × 28",28.6,39000,21000,0],
@@ -124,12 +127,12 @@ try{Object.assign(st,JSON.parse(localStorage.getItem("nvSpring")||"{}"))}catch(e
 $("h").innerHTML=H.map((r,i)=>`<option value="${i}">${r[0]}</option>`).join("");
 const fmt=n=>Math.round(n).toLocaleString();
 const sg=x=>{const r=Math.round(x);return (r>0?"+":r<0?"−":"±")+Math.abs(r).toLocaleString()};
-function cyc(s,turns){ // interpolate chart cycles (15" turns: 7′=7.9, 8′=8.8)
+function cyc(s,turns){ // interpolate chart cycles by turns; chart ratings assume SSC turns 7′=7.9, 8′=8.9
   const a=s[4],b=s[5];
   if(turns<=7.9) return (turns<7.85?"> ":"≈ ")+fmt(a);
   if(b==null) return "n/a";
-  if(turns>=8.8) return (turns>8.85?"< ":"≈ ")+fmt(b);
-  return "≈ "+fmt(a+(b-a)*(turns-7.9)/0.9);
+  if(turns>=8.9) return (turns>8.95?"< ":"≈ ")+fmt(b);
+  return "≈ "+fmt(a+(b-a)*(turns-7.9)/1.0);
 }
 function coil(cols){
   return cols.map(c=>{const k=C[c];let p="";for(let i=0;i<13;i++){const x=12+i*13;
@@ -139,10 +142,11 @@ function coil(cols){
     return `<svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${esc(c)} spring">`+
       `<rect x="2" y="56" width="196" height="8" rx="4" fill="#7d8794"/>${p}</svg>`}).join("");
 }
+const ip=s=>s[3].toFixed(1);
 function sw(cols){return `<span class="sw">${cols.map(c=>`<i style="background:${C[c]}"></i>`).join("")}</span>`}
 function band(pct){const a=Math.abs(pct);return a<=2.5?["ok","Balances"]:a<=5?["warn","Close — check balance"]:["bad","Off — consider other spring"]}
 function render(){
-  const r=H[st.h],[m,turns]=r[TI[st.t]],W=+st.w;
+  const r=H[st.h],[m0,t0]=r[TI[st.t]],hma=m0*t0,turns=Math.round((r[1]/12+OFF[st.t])*4)/4,m=hma/turns,W=+st.w;
   const pool=S.filter(s=>st.inv==="all"||(st.inv==="hc")===!!s[6]).map(s=>({s,lift:2*s[3]/m}));
   pool.sort((a,b)=>a.lift-b.lift);
   const out=$("out");
@@ -152,21 +156,21 @@ function render(){
   const min=pool[0].lift,max=pool[pool.length-1].lift;
   const range=W>max*1.05?`<p class="msg bad">Heavier than the strongest pair in this inventory (${fmt(max)} lb). Order springs.</p>`:
              W<min*0.95?`<p class="msg bad">Lighter than the weakest pair in this inventory (${fmt(min)} lb). Order springs.</p>`:"";
-  const q=Math.round(turns*4),perQ=2*best.s[3]*0.25/HMA;
+  const q=Math.round(turns*4),perQ=2*best.s[3]*0.25/hma;
   let alt="";
   if(st.inv==="std"){const hc=S.filter(s=>s[6]).map(s=>({s,lift:2*s[3]/m}));let b=hc[0];for(const p of hc)if(Math.abs(p.lift-W)<Math.abs(b.lift-W))b=p;
-    const dd=b.lift-W;alt=`<div class="alt">High-cycle option: ${sw(b.s[1])}<b>${esc(b.s[0])}</b> · ${fmt(b.lift)} lb (${sg(dd)}) · ${cyc(b.s,turns)} cycles</div>`}
+    const dd=b.lift-W;alt=`<div class="alt">High-cycle option: ${sw(b.s[1])}<b>${esc(b.s[0])}</b> · IPPT ${ip(b.s)} · ${fmt(b.lift)} lb (${sg(dd)}) · ${cyc(b.s,turns)} cycles</div>`}
   out.innerHTML=`${range}<div class="coil">${coil(best.s[1])}</div>
-   <div><p class="name">${esc(best.s[0])}</p><div class="dims">${esc(best.s[2])}</div></div>
+   <div><p class="name">${esc(best.s[0])}</p><div class="dims">${esc(best.s[2])}</div><div class="dims">IPPT <b class="ippt">${ip(best.s)}</b> per spring${best.s[1].length>1?" (pair average)":""}</div></div>
    <div class="big">${fmt(best.lift)}<small> lb pair lift</small></div>
    <div><span class="badge ${cls}">${sg(d)} lb (${Math.abs(pct).toFixed(1)}%) ${Math.round(d)>0?"strong":Math.round(d)<0?"weak":"exact"} · ${txt}</span></div>
-   <div class="stats"><div><b>${turns.toFixed(1)}</b><span>turns (${q} quarters)</span></div>
+   <div class="stats"><div><b>${tf(turns)}</b><span>turns to wind (${q} quarters)</span></div>
      <div><b>${cyc(best.s,turns)}</b><span>approx. cycles</span></div>
      <div><b>±${perQ.toFixed(1)} lb</b><span>per ¼ turn</span></div></div>${alt}`;
   const i=pool.indexOf(best),near=pool.slice(Math.max(0,i-3),i+4);
-  $("lt").textContent=`Nearby options · ${r[0]}, ${st.t==="LH"?"Low HR":st.t+"″ radius"}, multiplier ${m.toFixed(4)}`;
-  $("tbl").innerHTML=`<thead><tr><th>Spring</th><th class="hide-s">Dimensions</th><th class="n">Lift</th><th class="n">vs door</th><th class="n">Cycles</th></tr></thead><tbody>`+
-    near.map(p=>{const dd=p.lift-W;return `<tr class="${p===best?"hit":""}"><td>${sw(p.s[1])}${esc(p.s[0])}</td><td class="hide-s">${esc(p.s[2])}</td><td class="n">${fmt(p.lift)}</td><td class="n">${sg(dd)}</td><td class="n">${cyc(p.s,turns)}</td></tr>`}).join("")+`</tbody>`;
+  $("lt").textContent=`Nearby options · ${r[0]}, ${st.t==="LH"?"Low HR":st.t+"″ radius"}, ${tf(turns)} turns · multiplier ${m.toFixed(4)}`;
+  $("tbl").innerHTML=`<thead><tr><th>Spring</th><th class="hide-s">Dimensions</th><th class="n">IPPT</th><th class="n">Lift</th><th class="n">vs door</th><th class="n">Cycles</th></tr></thead><tbody>`+
+    near.map(p=>{const dd=p.lift-W;return `<tr class="${p===best?"hit":""}"><td><span class="nm">${sw(p.s[1])}<span>${esc(p.s[0])}</span></span></td><td class="hide-s">${esc(p.s[2])}</td><td class="n">${ip(p.s)}</td><td class="n">${fmt(p.lift)}</td><td class="n">${sg(dd)}</td><td class="n">${cyc(p.s,turns)}</td></tr>`}).join("")+`</tbody>`;
 }
 function sync(){
   $("h").value=st.h;$("w").value=st.w;
