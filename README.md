@@ -2,7 +2,7 @@
 
 Field tool for picking a replacement 2″ torsion spring pair from truck inventory, given door height, door weight and track type.
 
-- **Live:** https://northviewdoorsystems.github.io/spring-picker/
+- **Live:** https://northviewdoorsystems.github.io/springs/
 - **Hosting:** GitHub Pages, deploy from branch `main`, folder `/ (root)`
 - **iPhone:** open the live URL in Safari → Share → Add to Home Screen
 
